@@ -1,0 +1,16 @@
+C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\bin\Debug\ZovMusic.exe.config
+C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\bin\Debug\ZovMusic.exe
+C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\bin\Debug\ZovMusic.pdb
+C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\obj\Debug\ZovMusic.csproj.AssemblyReference.cache
+C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\obj\Debug\Interop.MediaPlayer.dll
+C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\obj\Debug\Interop.WMLSS.dll
+C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\obj\Debug\Interop.WMPDXMLib.dll
+C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\obj\Debug\Interop.WMPLauncher.dll
+C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\obj\Debug\Interop.WMPLib.dll
+C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\obj\Debug\ZovMusic.csproj.ResolveComReference.cache
+C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\obj\Debug\ZovMusic.Form1.resources
+C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\obj\Debug\ZovMusic.Properties.Resources.resources
+C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\obj\Debug\ZovMusic.csproj.GenerateResource.cache
+C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\obj\Debug\ZovMusic.csproj.CoreCompileInputs.cache
+C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\obj\Debug\ZovMusic.exe
+C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\obj\Debug\ZovMusic.pdb
