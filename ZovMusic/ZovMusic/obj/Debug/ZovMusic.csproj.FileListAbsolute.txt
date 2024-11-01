@@ -14,3 +14,7 @@ C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\obj\Debug\ZovMusic.cs
 C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\obj\Debug\ZovMusic.csproj.CoreCompileInputs.cache
 C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\obj\Debug\ZovMusic.exe
 C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\obj\Debug\ZovMusic.pdb
+C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\bin\Debug\TagLibSharp.dll
+C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\bin\Debug\TagLibSharp.pdb
+C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\bin\Debug\TagLibSharp.xml
+C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\obj\Debug\ZovMusic.csproj.Up2Date

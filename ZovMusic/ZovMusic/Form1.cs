@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using WMPLib;
+using TagLib;
 
 namespace ZovMusic
 {
@@ -18,46 +20,8 @@ namespace ZovMusic
 
         private void InitializePlayer()
         {
-            Button playButton = new Button { Text = "Play", Left = 10, Top = 10 };
-            playButton.Click += PlayButton_Click;
-
-            Button pauseButton = new Button { Text = "Pause", Left = 90, Top = 10 };
-            pauseButton.Click += PauseButton_Click;
-
-            Button loadButton = new Button { Text = "Load MP3", Left = 170, Top = 10 };
-            loadButton.Click += LoadButton_Click;
-
-            TrackBar volumeSlider = new TrackBar { Left = 10, Top = 50, Width = 200, Maximum = 100, Value = 50 };
-            volumeSlider.Scroll += (sender, args) => player.settings.volume = volumeSlider.Value;
-
-            TrackBar seekBar = new TrackBar { Left = 10, Top = 90, Width = 300, Maximum = 100 };
-            seekBar.MouseDown += (sender, args) =>
-            {
-                if (player.currentMedia != null && player.currentMedia.duration > 0)
-                    player.controls.currentPosition = player.currentMedia.duration * seekBar.Value / 100;
-            };
-
-            Label currentTimeLabel = new Label { Left = 320, Top = 90, Width = 100 };
-            Label durationLabel = new Label { Left = 320, Top = 110, Width = 100 };
-
-            Controls.Add(playButton);
-            Controls.Add(pauseButton);
-            Controls.Add(loadButton);
-            Controls.Add(volumeSlider);
-            Controls.Add(seekBar);
-            Controls.Add(currentTimeLabel);
-            Controls.Add(durationLabel);
-
             timer = new Timer { Interval = 1000 };
-            timer.Tick += (sender, args) =>
-            {
-                if (player.currentMedia != null && player.controls.currentPosition >= 0 && player.currentMedia.duration > 0)
-                {
-                    seekBar.Value = (int)(player.controls.currentPosition / player.currentMedia.duration * 100);
-                    currentTimeLabel.Text = FormatTime(player.controls.currentPosition);
-                    durationLabel.Text = FormatTime(player.currentMedia.duration);
-                }
-            };
+            timer.Tick += Timer_Tick;
             timer.Start();
         }
 
@@ -87,15 +51,85 @@ namespace ZovMusic
                 {
                     player.URL = dialog.FileName;
                     player.controls.stop();
+                    LoadAlbumCover(dialog.FileName);
                 }
             }
         }
+
+        private void VolumeSlider_Scroll(object sender, EventArgs e)
+        {
+            player.settings.volume = ((TrackBar)sender).Value;
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            if (player.currentMedia != null && player.controls.currentPosition >= 0 && player.currentMedia.duration > 0)
+            {
+                // Обновляем позицию ползунка на основе текущего положения трека
+                seekBar.Value = (int)(player.controls.currentPosition / player.currentMedia.duration * 100);
+                currentTimeLabel.Text = FormatTime(player.controls.currentPosition);
+                durationLabel.Text = FormatTime(player.currentMedia.duration);
+            }
+        }
+
+        private void SeekBar_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (player.currentMedia != null && player.currentMedia.duration > 0)
+            {
+                // Пересчитываем положение в диапазоне от 0 до 1 и устанавливаем позицию трека
+                var seekBar = (TrackBar)sender;
+                double newPosition = seekBar.Value / 100.0;
+                player.controls.currentPosition = player.currentMedia.duration * newPosition;
+            }
+        }
+
+        private void SeekBar_Scroll(object sender, EventArgs e)
+        {
+            if (player.currentMedia != null && player.currentMedia.duration > 0)
+            {
+                // Пересчитываем позицию ползунка и обновляем текущую позицию трека
+                double newPosition = seekBar.Value / 100.0;
+                player.controls.currentPosition = player.currentMedia.duration * newPosition;
+            }
+        }
+
 
         private string FormatTime(double seconds)
         {
             TimeSpan time = TimeSpan.FromSeconds(seconds);
             return time.ToString(@"mm\:ss");
         }
+
+        private void LoadAlbumCover(string filePath)
+        {
+            try
+            {
+                var file = TagLib.File.Create(filePath);
+
+                // Проверка на наличие изображений в метаданных
+                if (file.Tag.Pictures != null && file.Tag.Pictures.Length > 0)
+                {
+                    // Извлекаем изображение обложки из метаданных
+                    var bin = (byte[])(file.Tag.Pictures[0].Data.Data);
+                    using (var ms = new MemoryStream(bin))
+                    {
+                        albumCoverBox.Image = Image.FromStream(ms);
+                    }
+                }
+                else
+                {
+                    // Если обложка отсутствует, устанавливаем заглушку
+                    albumCoverBox.Image = Properties.Resources.placeholder;
+                    MessageBox.Show("Обложка отсутствует в этом файле.", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                // В случае ошибки устанавливаем заглушку и выводим сообщение об ошибке
+                albumCoverBox.Image = Properties.Resources.placeholder;
+                MessageBox.Show($"Ошибка при загрузке обложки: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
     }
 }
-
