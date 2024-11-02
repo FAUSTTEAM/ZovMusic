@@ -43,23 +43,23 @@ namespace ZovMusic
 
         private void LoadButton_Click(object sender, EventArgs e)
         {
-            using (OpenFileDialog dialog = new OpenFileDialog())
+            using (OpenFileDialog ofd = new OpenFileDialog())
             {
-                dialog.Filter = "MP3 Files|*.mp3";
-                dialog.Multiselect = false;
-                if (dialog.ShowDialog() == DialogResult.OK)
+                ofd.Filter = "MP3 Files|*.mp3";
+                if (ofd.ShowDialog() == DialogResult.OK)
                 {
-                    player.URL = dialog.FileName;
-                    player.controls.stop();
-                    LoadAlbumCover(dialog.FileName);
+                    player.URL = ofd.FileName;
+                    LoadTrackInfo(ofd.FileName); // Загрузка информации о треке
                 }
             }
         }
+
 
         private void VolumeSlider_Scroll(object sender, EventArgs e)
         {
             player.settings.volume = ((TrackBar)sender).Value;
         }
+
 
         private void Timer_Tick(object sender, EventArgs e)
         {
@@ -67,10 +67,17 @@ namespace ZovMusic
             {
                 // Обновляем позицию ползунка на основе текущего положения трека
                 seekBar.Value = (int)(player.controls.currentPosition / player.currentMedia.duration * 100);
+
+                // Текущее время трека
                 currentTimeLabel.Text = FormatTime(player.controls.currentPosition);
-                durationLabel.Text = FormatTime(player.currentMedia.duration);
+
+                // Оставшееся время до конца трека
+                double remainingTime = player.currentMedia.duration - player.controls.currentPosition;
+                durationLabel.Text = FormatTime(remainingTime);
             }
         }
+        
+
 
         private void SeekBar_MouseDown(object sender, MouseEventArgs e)
         {
@@ -96,9 +103,11 @@ namespace ZovMusic
 
         private string FormatTime(double seconds)
         {
-            TimeSpan time = TimeSpan.FromSeconds(seconds);
-            return time.ToString(@"mm\:ss");
+            int minutes = (int)seconds / 60;
+            int secs = (int)seconds % 60;
+            return $"{minutes:D2}:{secs:D2}";
         }
+
 
         private void LoadAlbumCover(string filePath)
         {
@@ -131,5 +140,59 @@ namespace ZovMusic
             }
         }
 
+        private void currentTimeLabel_Click(object sender, EventArgs e)
+        {
+            // я случайно это добавил
+        }
+
+
+        private void LoadTrackInfo(string filePath)
+        {
+            try
+            {
+                var file = TagLib.File.Create(filePath);
+
+                // Название трека
+                if (!string.IsNullOrEmpty(file.Tag.Title))
+                {
+                    trackTitleLabel.Text = $"Title: {file.Tag.Title}";
+                }
+                else
+                {
+                    trackTitleLabel.Text = "Title: Unknown";
+                }
+
+                // Имя исполнителя
+                if (file.Tag.Performers.Length > 0 && !string.IsNullOrEmpty(file.Tag.Performers[0]))
+                {
+                    artistLabel.Text = $"Artist: {file.Tag.Performers[0]}";
+                }
+                else
+                {
+                    artistLabel.Text = "Artist: Unknown";
+                }
+
+                // Загрузка обложки (если она есть)
+                if (file.Tag.Pictures != null && file.Tag.Pictures.Length > 0)
+                {
+                    var bin = (byte[])(file.Tag.Pictures[0].Data.Data);
+                    using (var ms = new MemoryStream(bin))
+                    {
+                        albumCoverBox.Image = Image.FromStream(ms);
+                    }
+                }
+                else
+                {
+                    albumCoverBox.Image = Properties.Resources.placeholder;
+                }
+            }
+            catch (Exception ex)
+            {
+                albumCoverBox.Image = Properties.Resources.placeholder;
+                trackTitleLabel.Text = "Title: Unknown";
+                artistLabel.Text = "Artist: Unknown";
+                MessageBox.Show($"Ошибка при загрузке информации о треке: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
     }
 }
