@@ -35,6 +35,7 @@
             this.currentTimeLabel = new System.Windows.Forms.Label();
             this.durationLabel = new System.Windows.Forms.Label();
             this.albumCoverBox = new System.Windows.Forms.PictureBox();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.volumeSlider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seekBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.albumCoverBox)).BeginInit();
@@ -134,11 +135,21 @@
             this.albumCoverBox.TabIndex = 7;
             this.albumCoverBox.TabStop = false;
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(0, 9);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(143, 25);
+            this.label1.TabIndex = 8;
+            this.label1.Text = "Zov productin";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(788, 662);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.trackTitleLabel);
             this.Controls.Add(this.artistLabel);
             this.Controls.Add(this.playButton);
@@ -149,6 +160,7 @@
             this.Controls.Add(this.currentTimeLabel);
             this.Controls.Add(this.durationLabel);
             this.Controls.Add(this.albumCoverBox);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "Form1";
             this.Text = "Music Player";
             ((System.ComponentModel.ISupportInitialize)(this.volumeSlider)).EndInit();
@@ -158,5 +170,7 @@
             this.PerformLayout();
 
         }
+
+        private System.Windows.Forms.Label label1;
     }
 }
