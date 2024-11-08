@@ -3,7 +3,6 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using WMPLib;
-using TagLib;
 
 namespace ZovMusic
 {
@@ -11,6 +10,7 @@ namespace ZovMusic
     {
         private WindowsMediaPlayer player = new WindowsMediaPlayer();
         private Timer timer;
+
 
         public Form1()
         {
@@ -36,9 +36,22 @@ namespace ZovMusic
         private void PauseButton_Click(object sender, EventArgs e)
         {
             if (player.playState == WMPPlayState.wmppsPlaying)
+            {
+                pauseButton.Text = "Play";
                 player.controls.pause();
+            }
             else if (player.playState == WMPPlayState.wmppsPaused)
+            {
                 player.controls.play();
+                pauseButton.Text = "Pause";
+            }
+            else if (player.playState == WMPPlayState.wmppsStopped)
+            {
+                // Если трек завершён, начинаем воспроизведение с начала
+                player.controls.currentPosition = 0; // Сброс текущей позиции на начало
+                player.controls.play();
+                pauseButton.Text = "Pause";
+            }
         }
 
         private void LoadButton_Click(object sender, EventArgs e)
@@ -76,7 +89,7 @@ namespace ZovMusic
                 durationLabel.Text = FormatTime(remainingTime);
             }
         }
-        
+
 
 
         private void SeekBar_MouseDown(object sender, MouseEventArgs e)
@@ -192,6 +205,33 @@ namespace ZovMusic
                 trackTitleLabel.Text = "Title: Unknown";
                 artistLabel.Text = "Artist: Unknown";
                 MessageBox.Show($"Ошибка при загрузке информации о треке: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void RepeatButton_Click(object sender, EventArgs e)
+        {
+            player.PlayStateChange += new _WMPOCXEvents_PlayStateChangeEventHandler(Player_PlayStateChange);
+            isRepeatEnabled = !isRepeatEnabled;
+
+            if (isRepeatEnabled)
+            {
+                repeatButton.Text = "Repeat On";
+                repeatButton.BackColor = Color.LightGreen;
+            }
+            else
+            {
+                repeatButton.Text = "Repeat Off";
+                repeatButton.BackColor = Color.LightGray;
+            }
+        }
+
+        // Метод для автоматического повтора трека
+        private void Player_PlayStateChange(int NewState)
+        {
+            if (NewState == (int)WMPPlayState.wmppsStopped && isRepeatEnabled)
+            {
+                // Если режим повтора включен и трек остановился, начинаем воспроизведение заново
+                player.controls.play();
             }
         }
     }
