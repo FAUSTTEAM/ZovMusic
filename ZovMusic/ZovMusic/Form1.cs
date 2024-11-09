@@ -10,12 +10,25 @@ namespace ZovMusic
     {
         private WindowsMediaPlayer player = new WindowsMediaPlayer();
         private Timer timer;
-
-
+        private string defaultMusicFilePath;
         public Form1()
         {
             InitializeComponent();
-            InitializePlayer();
+
+            player.PlayStateChange += new _WMPOCXEvents_PlayStateChangeEventHandler(Player_PlayStateChange);
+
+            defaultMusicFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "default.mp3");
+
+            if (File.Exists(defaultMusicFilePath))
+            {
+                player.URL = defaultMusicFilePath;                   
+                player.controls.pause();
+                pauseButton.Text = "Play";
+            }
+            else
+            {
+                MessageBox.Show($"Файл по умолчанию не найден: {defaultMusicFilePath}", "Ошибка");
+            }
         }
 
         private void InitializePlayer()
@@ -45,10 +58,9 @@ namespace ZovMusic
                 player.controls.play();
                 pauseButton.Text = "Pause";
             }
-            else if (player.playState == WMPPlayState.wmppsStopped)
+            else if (player.playState == WMPPlayState.wmppsStopped) // когда закончился трек чтобы можно было воспроизвести снова 
             {
-                // Если трек завершён, начинаем воспроизведение с начала
-                player.controls.currentPosition = 0; // Сброс текущей позиции на начало
+                player.controls.currentPosition = 0; 
                 player.controls.play();
                 pauseButton.Text = "Pause";
             }
@@ -62,7 +74,7 @@ namespace ZovMusic
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
                     player.URL = ofd.FileName;
-                    LoadTrackInfo(ofd.FileName); // Загрузка информации о треке
+                    LoadTrackInfo(ofd.FileName); 
                 }
             }
         }
@@ -131,7 +143,7 @@ namespace ZovMusic
                 // Проверка на наличие изображений в метаданных
                 if (file.Tag.Pictures != null && file.Tag.Pictures.Length > 0)
                 {
-                    // Извлекаем изображение обложки из метаданных
+                    // Извлекаем изображение обложки из mp3
                     var bin = (byte[])(file.Tag.Pictures[0].Data.Data);
                     using (var ms = new MemoryStream(bin))
                     {
@@ -140,14 +152,14 @@ namespace ZovMusic
                 }
                 else
                 {
-                    // Если обложка отсутствует, устанавливаем заглушку
+                    // заглушка
                     albumCoverBox.Image = Properties.Resources.placeholder;
                     MessageBox.Show("Обложка отсутствует в этом файле.", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
-                // В случае ошибки устанавливаем заглушку и выводим сообщение об ошибке
+                
                 albumCoverBox.Image = Properties.Resources.placeholder;
                 MessageBox.Show($"Ошибка при загрузке обложки: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -185,7 +197,7 @@ namespace ZovMusic
                     artistLabel.Text = "Artist: Unknown";
                 }
 
-                // Загрузка обложки (если она есть)
+                // Загрузка обложки (если она есть))))
                 if (file.Tag.Pictures != null && file.Tag.Pictures.Length > 0)
                 {
                     var bin = (byte[])(file.Tag.Pictures[0].Data.Data);
@@ -225,12 +237,12 @@ namespace ZovMusic
             }
         }
 
-        // Метод для автоматического повтора трека
+        // повтор трека
         private void Player_PlayStateChange(int NewState)
         {
             if (NewState == (int)WMPPlayState.wmppsStopped && isRepeatEnabled)
             {
-                // Если режим повтора включен и трек остановился, начинаем воспроизведение заново
+                
                 player.controls.play();
             }
         }
