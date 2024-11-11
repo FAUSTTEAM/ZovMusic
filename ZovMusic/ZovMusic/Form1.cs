@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NAudio.Wave;
+using System;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -11,9 +12,21 @@ namespace ZovMusic
         private WindowsMediaPlayer player = new WindowsMediaPlayer();
         private Timer timer;
         private string defaultMusicFilePath;
+
+
+        private WaveOutEvent outputDevice;
+        private AudioFileReader audioFile;
+        private Timer reverseTimer;
+        private bool isReversing = false;
+
+        private Button muteButton;
+        private int previousVolume;
+        private bool isMuted = false;
+
         public Form1()
         {
             InitializeComponent();
+            InitializePlayer();
 
             player.PlayStateChange += new _WMPOCXEvents_PlayStateChangeEventHandler(Player_PlayStateChange);
 
@@ -21,7 +34,7 @@ namespace ZovMusic
 
             if (File.Exists(defaultMusicFilePath))
             {
-                player.URL = defaultMusicFilePath;                   
+                player.URL = defaultMusicFilePath;
                 player.controls.pause();
                 pauseButton.Text = "Play";
             }
@@ -29,6 +42,12 @@ namespace ZovMusic
             {
                 MessageBox.Show($"Файл по умолчанию не найден: {defaultMusicFilePath}", "Ошибка");
             }
+
+            reverseTimer = new Timer();
+            reverseTimer.Interval = 100;
+            reverseTimer.Tick += ReverseTimer_Tick;
+
+           
         }
 
         private void InitializePlayer()
@@ -60,7 +79,7 @@ namespace ZovMusic
             }
             else if (player.playState == WMPPlayState.wmppsStopped) // когда закончился трек чтобы можно было воспроизвести снова 
             {
-                player.controls.currentPosition = 0; 
+                player.controls.currentPosition = 0;
                 player.controls.play();
                 pauseButton.Text = "Pause";
             }
@@ -74,7 +93,7 @@ namespace ZovMusic
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
                     player.URL = ofd.FileName;
-                    LoadTrackInfo(ofd.FileName); 
+                    LoadTrackInfo(ofd.FileName);
                 }
             }
         }
@@ -157,9 +176,9 @@ namespace ZovMusic
                     MessageBox.Show("Обложка отсутствует в этом файле.", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                
+
                 albumCoverBox.Image = Properties.Resources.placeholder;
                 MessageBox.Show($"Ошибка при загрузке обложки: {ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -242,9 +261,89 @@ namespace ZovMusic
         {
             if (NewState == (int)WMPPlayState.wmppsStopped && isRepeatEnabled)
             {
-                
+
                 player.controls.play();
+            }
+        }
+
+        private void Rewind15Button_Click(object sender, EventArgs e) => Rewind(15);
+        private void Rewind30Button_Click(object sender, EventArgs e) => Rewind(30);
+        private void Rewind45Button_Click(object sender, EventArgs e) => Rewind(45);
+        private void Rewind60Button_Click(object sender, EventArgs e) => Rewind(60);
+
+        private void Forward15Button_Click(object sender, EventArgs e) => Forward(15);
+        private void Forward30Button_Click(object sender, EventArgs e) => Forward(30);
+        private void Forward45Button_Click(object sender, EventArgs e) => Forward(45);
+        private void Forward60Button_Click(object sender, EventArgs e) => Forward(60);
+
+        private void Rewind(int seconds)
+        {
+            double newTime = player.controls.currentPosition - seconds;
+            player.controls.currentPosition = newTime < 0 ? 0 : newTime;
+        }
+
+        private void Forward(int seconds)
+        {
+            double newTime = player.controls.currentPosition + seconds;
+            player.controls.currentPosition = newTime > player.currentMedia.duration ? player.currentMedia.duration : newTime;
+        }
+
+        // Обработчик для кнопки обратного воспроизведения
+        // Обработчик для кнопки обратного воспроизведения
+        private void PlayReverseButton_Click(object sender, EventArgs e)
+        {
+            if (isReversing)
+            {
+                // Останавливаем обратное воспроизведение
+                reverseTimer.Stop();
+                isReversing = false;
+                player.controls.play();  // Возобновляем обычное воспроизведение
+                playReverseButton.Text = "Reverse";
+            }
+            else
+            {
+                // Запускаем обратное воспроизведение
+                reverseTimer.Start();
+                isReversing = true;
+                player.controls.pause();  // Приостанавливаем обычное воспроизведение
+                playReverseButton.Text = "Stop Reverse";
+            }
+        }
+
+        // Обратное воспроизведение через уменьшение позиции
+        private void ReverseTimer_Tick(object sender, EventArgs e)
+        {
+            if (player.controls.currentPosition > 0.1) // Проверяем, что не достигли начала трека
+            {
+                player.controls.currentPosition -= 0.1;  // Уменьшаем текущую позицию на 0.1 сек
+            }
+            else
+            {
+                // Если достигли начала трека, останавливаем таймер и воспроизведение
+                reverseTimer.Stop();
+                isReversing = false;
+                playReverseButton.Text = "Reverse";
+            }
+        }
+
+        private void MuteButton_Click(object sender, EventArgs e)
+        {
+            if (isMuted)
+            {
+                // Восстанавливаем предыдущую громкость
+                player.settings.volume = previousVolume;
+                muteButton.Text = "Mute";
+                isMuted = false;
+            }
+            else
+            {
+                // Запоминаем текущий уровень громкости и устанавливаем громкость на 0
+                previousVolume = player.settings.volume;
+                player.settings.volume = 0;
+                muteButton.Text = "Unmute";
+                isMuted = true;
             }
         }
     }
 }
+
