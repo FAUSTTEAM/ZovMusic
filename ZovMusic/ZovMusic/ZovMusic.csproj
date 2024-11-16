@@ -174,7 +174,9 @@
     <None Include="Resources\images.jpeg" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\9297.mp3" />
     <Content Include="Resources\default.mp3" />
+    <Content Include="Resources\NormalCursor.cur" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

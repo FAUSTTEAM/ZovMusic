@@ -1,9 +1,14 @@
 ﻿using NAudio.Wave;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Reflection;
+using System.Security.Cryptography;
 using System.Windows.Forms;
 using WMPLib;
+using ZovMusic.Properties;
+
 
 namespace ZovMusic
 {
@@ -23,20 +28,63 @@ namespace ZovMusic
         private int previousVolume;
         private bool isMuted = false;
 
+        private WindowsMediaPlayer player2 = new WindowsMediaPlayer();
+        private List<Form> popups = new List<Form>();
         public Form1()
         {
             InitializeComponent();
             InitializePlayer();
+            SetCustomCursor();
 
             player.PlayStateChange += new _WMPOCXEvents_PlayStateChangeEventHandler(Player_PlayStateChange);
 
-            defaultMusicFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "default.mp3");
+            //defaultMusicFilePath = @"C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\Resources\default.mp3";
 
             if (File.Exists(defaultMusicFilePath))
             {
                 player.URL = defaultMusicFilePath;
                 player.controls.pause();
                 pauseButton.Text = "Play";
+
+                var file = TagLib.File.Create(defaultMusicFilePath);
+
+                // Проверка на наличие изображений в метаданных
+                if (file.Tag.Pictures != null && file.Tag.Pictures.Length > 0)
+                {
+                    // Извлекаем изображение обложки из mp3
+                    var bin = (byte[])(file.Tag.Pictures[0].Data.Data);
+                    using (var ms = new MemoryStream(bin))
+                    {
+                        albumCoverBox.Image = Image.FromStream(ms);
+                    }
+                }
+                else
+                {
+                    // заглушка
+                    albumCoverBox.Image = Properties.Resources.placeholder;
+                    MessageBox.Show("Обложка отсутствует в этом файле.", "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                // Название трека
+                if (!string.IsNullOrEmpty(file.Tag.Title))
+                {
+                    trackTitleLabel.Text = $"Title: {file.Tag.Title}";
+                }
+                else
+                {
+                    trackTitleLabel.Text = "Title: Unknown";
+                }
+
+                // Имя исполнителя
+                if (file.Tag.Performers.Length > 0 && !string.IsNullOrEmpty(file.Tag.Performers[0]))
+                {
+                    artistLabel.Text = $"Artist: {file.Tag.Performers[0]}";
+                }
+                else
+                {
+                    artistLabel.Text = "Artist: Unknown";
+                }
+
+
             }
             else
             {
@@ -102,6 +150,7 @@ namespace ZovMusic
         private void VolumeSlider_Scroll(object sender, EventArgs e)
         {
             player.settings.volume = ((TrackBar)sender).Value;
+            player2.settings.volume = ((TrackBar)sender).Value;
         }
 
 
@@ -344,6 +393,99 @@ namespace ZovMusic
                 isMuted = true;
             }
         }
+
+        private void SetCustomCursor()
+        {
+            string cursorPath = @"C:\Users\redmi\OneDrive\Desktop\ZovMusic\ZovMusic\ZovMusic\Resources\NormalCursor.cur";
+            if (System.IO.File.Exists(cursorPath))
+            {
+                // Устанавливаем курсор для формы
+                this.Cursor = new Cursor(cursorPath);
+            }
+            else
+            {
+                MessageBox.Show("Файл курсора не найден. Проверьте путь к файлу.");
+            }
+        }
+        private void GoydaButton_Click(object sender, EventArgs e)
+        {
+            ShowPopups();
+            PlayAudio();
+        }
+
+        private void ShowPopups()
+        {
+            Random rand = new Random(); // Для генерации случайных позиций
+
+            // Получаем размеры экрана для размещения окон
+            int screenWidth = Screen.PrimaryScreen.Bounds.Width;
+            int screenHeight = Screen.PrimaryScreen.Bounds.Height;
+
+            for (int i = 0; i < 25; i++) // Создаем 5 всплывающих окон
+            {
+                Form popup = new Form
+                {
+                    Size = new Size(300, 200),
+                    FormBorderStyle = FormBorderStyle.None,
+                    BackColor = Color.White, // Устанавливаем белый фон
+                    StartPosition = FormStartPosition.Manual
+                };
+
+                // Устанавливаем случайное расположение на экране
+                int posX = rand.Next(0, screenWidth - popup.Width);
+                int posY = rand.Next(0, screenHeight - popup.Height);
+                popup.Location = new Point(posX, posY);
+
+                // Создаем метку с текстом "ГОЙДА!!!!!" и настраиваем ее
+                Label label = new Label
+                {
+                    Text = "ГОЙДА!!!!!",
+                    ForeColor = Color.Black, // Устанавливаем черный цвет текста
+                    Font = new Font("Arial", 24, FontStyle.Bold),
+                    AutoSize = false, // Отключаем авторазмер, чтобы можно было выровнять текст
+                    TextAlign = ContentAlignment.MiddleCenter, // Выравнивание текста по центру
+                    Dock = DockStyle.Fill // Занимаем всю область окна
+                };
+
+                popup.Controls.Add(label); // Добавляем метку на всплывающее окно
+                popups.Add(popup); // Добавляем окно в список
+                popup.Show(); // Отображаем всплывающее окно
+            }
+        }
+
+
+
+
+        private void PlayAudio()
+        {
+            player2 = new WindowsMediaPlayer();
+            player2.URL = @"C:\Users\redmi\Downloads\9297.mp3"; // Указываем путь к файлу
+            player2.controls.play();
+            player2.settings.volume = player.settings.volume+100;
+            player2.PlayStateChange += Player_PlayStateChange2;
+        }
+
+        private void Player_PlayStateChange2(int newState)
+        {
+            // Проверяем, закончился ли аудиофайл
+            if ((WMPPlayState)newState == WMPPlayState.wmppsStopped)
+            {
+                ClosePopups(); // Закрываем все окна
+            }
+        }
+
+        private void ClosePopups()
+        {
+            foreach (Form popup in popups)
+            {
+                popup.Close(); // Закрываем каждое всплывающее окно
+            }
+            popups.Clear();
+        }
     }
+
+
+
 }
+
 

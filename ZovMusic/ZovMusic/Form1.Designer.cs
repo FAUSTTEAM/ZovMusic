@@ -28,7 +28,8 @@ namespace ZovMusic
         private System.Windows.Forms.Button forward60Button;
 
         private System.Windows.Forms.Button playReverseButton;
-        
+
+        private Button goydaButton;
 
         private bool isRepeatEnabled = false; // Флаг для режима повтора
         protected override void Dispose(bool disposing)
@@ -65,6 +66,7 @@ namespace ZovMusic
             this.playReverseButton = new System.Windows.Forms.Button();
             this.reverseTimer = new System.Windows.Forms.Timer(this.components);
             this.muteButton = new System.Windows.Forms.Button();
+            this.goydaButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.volumeSlider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.seekBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.albumCoverBox)).BeginInit();
@@ -95,7 +97,7 @@ namespace ZovMusic
             // pauseButton
             // 
             this.pauseButton.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
-            this.pauseButton.Location = new System.Drawing.Point(254, 558);
+            this.pauseButton.Location = new System.Drawing.Point(274, 569);
             this.pauseButton.Margin = new System.Windows.Forms.Padding(4);
             this.pauseButton.Name = "pauseButton";
             this.pauseButton.Size = new System.Drawing.Size(182, 121);
@@ -105,17 +107,17 @@ namespace ZovMusic
             // 
             // loadButton
             // 
-            this.loadButton.Location = new System.Drawing.Point(22, 710);
+            this.loadButton.Location = new System.Drawing.Point(13, 41);
             this.loadButton.Margin = new System.Windows.Forms.Padding(4);
             this.loadButton.Name = "loadButton";
-            this.loadButton.Size = new System.Drawing.Size(181, 117);
+            this.loadButton.Size = new System.Drawing.Size(118, 94);
             this.loadButton.TabIndex = 2;
             this.loadButton.Text = "Load MP3";
             this.loadButton.Click += new System.EventHandler(this.LoadButton_Click);
             // 
             // volumeSlider
             // 
-            this.volumeSlider.Location = new System.Drawing.Point(464, 608);
+            this.volumeSlider.Location = new System.Drawing.Point(488, 608);
             this.volumeSlider.Margin = new System.Windows.Forms.Padding(4);
             this.volumeSlider.Maximum = 100;
             this.volumeSlider.Name = "volumeSlider";
@@ -157,7 +159,7 @@ namespace ZovMusic
             // albumCoverBox
             // 
             this.albumCoverBox.Image = global::ZovMusic.Properties.Resources.placeholder;
-            this.albumCoverBox.Location = new System.Drawing.Point(124, 21);
+            this.albumCoverBox.Location = new System.Drawing.Point(182, 27);
             this.albumCoverBox.Margin = new System.Windows.Forms.Padding(4);
             this.albumCoverBox.Name = "albumCoverBox";
             this.albumCoverBox.Size = new System.Drawing.Size(392, 354);
@@ -171,7 +173,7 @@ namespace ZovMusic
             this.repeatButton.FlatAppearance.BorderSize = 0;
             this.repeatButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.repeatButton.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.repeatButton.Location = new System.Drawing.Point(22, 569);
+            this.repeatButton.Location = new System.Drawing.Point(22, 578);
             this.repeatButton.Margin = new System.Windows.Forms.Padding(6);
             this.repeatButton.Name = "repeatButton";
             this.repeatButton.Size = new System.Drawing.Size(181, 110);
@@ -183,7 +185,7 @@ namespace ZovMusic
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(510, 579);
+            this.label1.Location = new System.Drawing.Point(534, 579);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(84, 25);
             this.label1.TabIndex = 8;
@@ -283,11 +285,21 @@ namespace ZovMusic
             this.muteButton.Text = "Mute";
             this.muteButton.Click += new System.EventHandler(this.MuteButton_Click);
             // 
+            // goydaButton
+            // 
+            this.goydaButton.Location = new System.Drawing.Point(22, 200);
+            this.goydaButton.Name = "goydaButton";
+            this.goydaButton.Size = new System.Drawing.Size(100, 50);
+            this.goydaButton.TabIndex = 0;
+            this.goydaButton.Text = "GOYDA!";
+            this.goydaButton.Click += new System.EventHandler(this.GoydaButton_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1020, 982);
+            this.ClientSize = new System.Drawing.Size(1104, 1002);
+            this.Controls.Add(this.goydaButton);
             this.Controls.Add(this.muteButton);
             this.Controls.Add(this.playReverseButton);
             this.Controls.Add(this.rewind15Button);
@@ -309,6 +321,7 @@ namespace ZovMusic
             this.Controls.Add(this.currentTimeLabel);
             this.Controls.Add(this.durationLabel);
             this.Controls.Add(this.albumCoverBox);
+            this.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
